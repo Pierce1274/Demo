@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectra Clips</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="clips-body">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <img src="/favicon.ico" alt="Connectra Logo" class="sidebar-logo" onclick="window.location='/'">
+        <div class="sidebar-link" title="Home" onclick="window.location='/home'"><i class="fas fa-home"></i></div>
+        <div class="sidebar-link" title="Users" onclick="window.location='/home'"><i class="fas fa-users"></i></div>
+        <div class="sidebar-link active" title="Connectra Clips" onclick="window.location='/clips'"><i class="fas fa-play"></i></div>
+        <div class="sidebar-link" title="Blog" onclick="window.location='/blog'"><i class="fas fa-blog"></i></div>
+        <div class="sidebar-link" title="About" onclick="window.location='/about'"><i class="fas fa-info-circle"></i></div>
+        <div class="sidebar-link" title="Profile" onclick="window.location='/profile'"><i class="fas fa-user"></i></div>
+        <div class="sidebar-link" title="Logout" onclick="window.location='/logout'"><i class="fas fa-sign-out-alt"></i></div>
+    </nav>
+
+    <!-- Clips Container -->
+    <div class="clips-container">
+        <!-- Header -->
+        <header class="clips-header">
+            <div class="clips-logo">
+                <i class="fas fa-play"></i>
+                <span>Connectra Clips</span>
+            </div>
+            <div class="clips-actions">
+                <button class="upload-btn" onclick="window.location='/clips/upload'">
+                    <i class="fas fa-plus"></i> Upload Clip
+                </button>
+            </div>
+        </header>
+
+        <!-- Clips Feed -->
+        <div class="clips-feed" id="clips-feed">
+            {% if clips %}
+                {% for clip in clips %}
+                <div class="clip-item" data-clip-id="{{ clip.id }}">
+                    <div class="clip-video-container">
+                        <video class="clip-video" loop muted playsinline>
+                            <source src="/clips/{{ clip.video_filename }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="clip-overlay">
+                            <div class="clip-info">
+                                <div class="clip-author" onclick="viewProfile('{{ clip.author }}')">
+                                    <div class="author-avatar">
+                                        {% set author_user = users|selectattr("username", "equalto", clip.author)|first %}
+                                        {% if author_user and author_user.avatar %}
+                                            <img src="/photos/{{ author_user.avatar }}" alt="Avatar">
+                                        {% else %}
+                                            <i class="fas fa-user-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="author-info">
+                                        <span class="author-name">{{ author_user.display_name if author_user else clip.author }}</span>
+                                        <span class="author-handle">@{{ clip.author }}</span>
+                                    </div>
+                                    <button class="follow-btn" onclick="toggleFollow('{{ clip.author }}', event)" data-username="{{ clip.author }}">
+                                        <i class="fas fa-plus"></i> Follow
+                                    </button>
+                                </div>
+                                <h3 class="clip-title">{{ clip.title }}</h3>
+                                {% if clip.description %}
+                                <p class="clip-description">{{ clip.description }}</p>
+                                {% endif %}
+                                <div class="clip-stats">
+                                    <span><i class="fas fa-eye"></i> {{ "{:,}".format(clip.views) }}</span>
+                                    <span><i class="fas fa-heart"></i> {{ "{:,}".format(clip.likes) }}</span>
+                                    <span><i class="fas fa-comment"></i> {{ clip.comments|length }}</span>
+                                    <span><i class="fas fa-share"></i> {{ clip.shares or 0 }}</span>
+                                </div>
+                            </div>
+                            <div class="clip-actions">
+                                <button class="action-btn like-btn" onclick="toggleLike('{{ clip.id }}')">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="like-count">{{ "{:,}".format(clip.likes) }}</span>
+                                </button>
+                                <button class="action-btn comment-btn" onclick="toggleComments('{{ clip.id }}')">
+                                    <i class="fas fa-comment"></i>
+                                    <span class="comment-count">{{ clip.comments|length }}</span>
+                                </button>
+                                <button class="action-btn share-btn" onclick="shareClip('{{ clip.id }}')">
+                                    <i class="fas fa-share"></i>
+                                    <span class="share-count">{{ clip.shares or 0 }}</span>
+                                </button>
+                                <button class="action-btn bookmark-btn" onclick="toggleBookmark('{{ clip.id }}')">
+                                    <i class="far fa-bookmark"></i>
+                                </button>
+                                <button class="action-btn more-btn" onclick="showClipOptions('{{ clip.id }}')">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="play-pause-btn" onclick="togglePlayPause(this)">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div class="comments-section" id="comments-{{ clip.id }}" style="display: none;">
+                        <div class="comments-header">
+                            <h4>Comments</h4>
+                            <button class="close-comments" onclick="toggleComments('{{ clip.id }}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="comments-list">
+                            {% for comment in clip.comments %}
+                            <div class="comment" data-comment-id="{{ comment.id }}">
+                                <div class="comment-header">
+                                    <div class="comment-author-info">
+                                        <div class="comment-avatar">
+                                            {% if comment.author_avatar %}
+                                                <img src="/photos/{{ comment.author_avatar }}" alt="Avatar">
+                                            {% else %}
+                                                <i class="fas fa-user-circle"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="comment-author-details">
+                                            <span class="comment-author">{{ comment.author_display_name or comment.author }}</span>
+                                            <span class="comment-handle">@{{ comment.author }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="comment-like-btn" onclick="toggleCommentLike('{{ comment.id }}')">
+                                            <i class="far fa-heart"></i>
+                                            <span class="comment-like-count">{{ comment.likes or 0 }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="comment-content">{{ comment.content }}</div>
+                                <div class="comment-time">{{ comment.created_at }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="comment-form">
+                            <input type="text" placeholder="Add a comment..." id="comment-input-{{ clip.id }}">
+                            <button onclick="addComment('{{ clip.id }}')">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-clips">
+                    <i class="fas fa-video"></i>
+                    <h2>No clips yet!</h2>
+                    <p>Be the first to upload a Connectra Clip</p>
+                    <button class="upload-btn" onclick="window.location='/clips/upload'">
+                        <i class="fas fa-plus"></i> Upload First Clip
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="/static/clips.js"></script>
+    <style>
+        .clips-body {
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .clips-container {
+            margin-left: 80px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .clips-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .clips-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--orange);
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            box-shadow: 0 8px 25px rgba(255, 79, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            font-size: 0.95rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(255, 79, 0, 0.4);
+            background: linear-gradient(135deg, var(--red), var(--orange));
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(255, 79, 0, 0.3);
+        }
+
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .upload-btn:hover::before {
+            left: 100%;
+        }
+        
+        .clips-feed {
+            flex: 1;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .clips-feed::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .clip-item {
+            height: calc(100vh - 80px);
+            position: relative;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .clip-video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 400px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .clip-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .clip-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 2rem 1rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .clip-info {
+            flex: 1;
+        }
+        
+        .clip-author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .clip-author:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .author-avatar i {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .author-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .author-handle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        .follow-btn {
+            background: var(--orange);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .follow-btn:hover {
+            background: var(--red);
+            transform: scale(1.05);
+        }
+
+        .follow-btn.following {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .follow-btn.following:hover {
+            background: var(--red);
+            color: white;
+        }
+        
+        .clip-title {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .clip-description {
+            margin: 0 0 0.5rem 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .clip-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .clip-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-left: 1rem;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .action-btn span {
+            font-size: 0.7rem;
+            margin-top: 0.2rem;
+        }
+        
+        .like-btn.liked {
+            background: var(--red);
+        }
+        
+        .play-pause-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .clip-video-container:hover .play-pause-btn {
+            opacity: 1;
+        }
+        
+        .no-clips {
+            text-align: center;
+            padding: 4rem 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .no-clips i {
+            font-size: 4rem;
+            color: var(--orange);
+            margin-bottom: 1rem;
+        }
+
+        .no-clips h2 {
+            margin: 1rem 0 0.5rem 0;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .no-clips p {
+            margin: 0 0 2rem 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Comments Styling */
+        .comment {
+            margin-bottom: 1.2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .comment-author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-avatar i {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .comment-author-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comment-author {
+            font-weight: 700;
+            color: var(--orange);
+            font-size: 0.9rem;
+        }
+
+        .comment-handle {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .comment-like-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .comment-like-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--red);
+        }
+
+        .comment-like-btn.liked {
+            color: var(--red);
+        }
+
+        .comment-like-btn.liked i {
+            animation: heartPulse 0.3s ease;
+        }
+
+        .comment-content {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .comment-time {
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        /* Bookmark button styling */
+        .bookmark-btn.bookmarked {
+            color: var(--orange);
+        }
+
+        .bookmark-btn.bookmarked i {
+            animation: bookmarkSave 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bookmarkSave {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+    </style>
+</body>
+</html>

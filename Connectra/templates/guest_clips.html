@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Mode - Connectra Clips</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="clips-bg">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <img src="/favicon.ico" alt="Connectra Logo" class="sidebar-logo" onclick="window.location='/'">
+        <div class="sidebar-link" title="Home" onclick="window.location='/guest/home'"><i class="fas fa-home"></i></div>
+        <div class="sidebar-link" title="Users" onclick="window.location='/guest/home'"><i class="fas fa-users"></i></div>
+        <div class="sidebar-link active" title="Connectra Clips" onclick="window.location='/guest/clips'"><i class="fas fa-play"></i></div>
+        <div class="sidebar-link" title="Blog" onclick="window.location='/guest/blog'"><i class="fas fa-blog"></i></div>
+        <div class="sidebar-link" title="About" onclick="window.location='/about'"><i class="fas fa-info-circle"></i></div>
+        <div class="sidebar-link guest-exit" title="Exit Guest Mode" onclick="window.location='/guest/exit'"><i class="fas fa-sign-out-alt"></i></div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Guest Mode Header -->
+        <header class="clips-header guest-header">
+            <div class="header-left">
+                <img src="/favicon.ico" alt="Connectra Logo" class="clips-logo">
+                <span class="clips-title">Connectra Clips</span>
+                <span class="guest-badge">GUEST MODE</span>
+            </div>
+            <div class="header-right">
+                <div class="guest-notice">
+                    <i class="fas fa-eye"></i>
+                    <span>View-only access</span>
+                </div>
+                <a href="/register" class="join-btn">Join to Upload</a>
+                <a href="/guest/exit" class="exit-guest-btn">Exit Guest</a>
+            </div>
+        </header>
+
+        <!-- Guest Mode Notice -->
+        <div class="guest-notice-banner">
+            <div class="notice-content">
+                <i class="fas fa-video"></i>
+                <div class="notice-text">
+                    <h3>Discover amazing content</h3>
+                    <p>You can watch clips but can't like, comment, or upload. <a href="/register">Join Connectra</a> to interact with creators!</p>
+                </div>
+                <a href="/register" class="notice-cta">Start Creating</a>
+            </div>
+        </div>
+
+        <!-- Clips Feed -->
+        <div class="clips-container">
+            {% if clips %}
+                <div class="clips-grid">
+                    {% for clip in clips %}
+                    <div class="clip-card guest-clip">
+                        <div class="clip-video">
+                            <video controls>
+                                <source src="/uploads/{{ clip.filename }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="guest-overlay">
+                                <i class="fas fa-eye"></i>
+                                <span>View Only</span>
+                            </div>
+                        </div>
+                        
+                        <div class="clip-info">
+                            <div class="clip-header">
+                                <div class="creator-info">
+                                    <div class="creator-avatar">
+                                        {% set creator = users | selectattr('username', 'equalto', clip.username) | first %}
+                                        {% if creator and creator.avatar %}
+                                            <img src="/photos/{{ creator.avatar }}" alt="Avatar">
+                                        {% else %}
+                                            <i class="fas fa-user-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="creator-details">
+                                        <h3>{{ clip.title }}</h3>
+                                        <p>by {{ clip.username }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="clip-description">{{ clip.description }}</p>
+                            
+                            <!-- Disabled Interaction Buttons -->
+                            <div class="clip-actions disabled">
+                                <button class="action-btn disabled" title="Sign up to like">
+                                    <i class="fas fa-heart"></i>
+                                    <span>{{ clip.likes | length }}</span>
+                                </button>
+                                <button class="action-btn disabled" title="Sign up to comment">
+                                    <i class="fas fa-comment"></i>
+                                    <span>{{ clip.comments | length }}</span>
+                                </button>
+                                <button class="action-btn disabled" title="Sign up to share">
+                                    <i class="fas fa-share"></i>
+                                    <span>{{ clip.shares | length }}</span>
+                                </button>
+                                <div class="guest-prompt">
+                                    <a href="/register">Sign up to interact</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-clips">
+                    <i class="fas fa-video"></i>
+                    <h2>No clips yet</h2>
+                    <p>Be the first to share amazing content!</p>
+                    <a href="/register" class="create-btn">Join & Upload First Clip</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        .guest-header {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+        }
+
+        .guest-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .guest-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .join-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #6c5ce7;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-left: 1rem;
+        }
+
+        .join-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .exit-guest-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .exit-guest-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .guest-notice-banner {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            color: white;
+            padding: 1.5rem;
+            margin: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(253, 121, 168, 0.3);
+        }
+
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .notice-content i {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+
+        .notice-text {
+            flex: 1;
+        }
+
+        .notice-text h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .notice-text p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .notice-text a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .notice-cta {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .notice-cta:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .guest-clip {
+            position: relative;
+        }
+
+        .guest-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(108, 92, 231, 0.9);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .clip-actions.disabled {
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .clip-actions.disabled .action-btn {
+            cursor: not-allowed;
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .clip-actions.disabled .action-btn:hover {
+            transform: none;
+            background: #f8f9fa;
+        }
+
+        .guest-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(108, 92, 231, 0.95);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .clip-actions.disabled:hover .guest-prompt {
+            opacity: 1;
+        }
+
+        .guest-prompt a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .guest-exit {
+            background: rgba(108, 92, 231, 0.1);
+            color: #6c5ce7;
+        }
+
+        .guest-exit:hover {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .no-clips {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+
+        .no-clips i {
+            font-size: 4rem;
+            color: #6c5ce7;
+            margin-bottom: 1rem;
+        }
+
+        .no-clips h2 {
+            color: var(--black);
+            margin-bottom: 1rem;
+        }
+
+        .create-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.3);
+        }
+    </style>
+</body>
+</html>

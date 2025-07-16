@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Mode - Connectra</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="home-bg">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <img src="/favicon.ico" alt="Connectra Logo" class="sidebar-logo" onclick="window.location='/'">
+        <div class="sidebar-link active" title="Home" onclick="window.location='/guest/home'"><i class="fas fa-home"></i></div>
+        <div class="sidebar-link" title="Users" onclick="window.location='/guest/home'"><i class="fas fa-users"></i></div>
+        <div class="sidebar-link" title="Connectra Clips" onclick="window.location='/guest/clips'"><i class="fas fa-play"></i></div>
+        <div class="sidebar-link" title="Blog" onclick="window.location='/guest/blog'"><i class="fas fa-blog"></i></div>
+        <div class="sidebar-link" title="About" onclick="window.location='/about'"><i class="fas fa-info-circle"></i></div>
+        <div class="sidebar-link guest-exit" title="Exit Guest Mode" onclick="window.location='/guest/exit'"><i class="fas fa-sign-out-alt"></i></div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Guest Mode Header -->
+        <header class="home-header guest-header">
+            <div class="header-left">
+                <img src="/favicon.ico" alt="Connectra Logo" class="home-logo">
+                <span class="home-title">Connectra</span>
+                <span class="guest-badge">GUEST MODE</span>
+            </div>
+            <div class="header-right">
+                <div class="guest-notice">
+                    <i class="fas fa-eye"></i>
+                    <span>View-only access</span>
+                </div>
+                <a href="/register" class="join-btn">Join Connectra</a>
+                <a href="/guest/exit" class="exit-guest-btn">Exit Guest</a>
+            </div>
+        </header>
+
+        <!-- Guest Mode Notice -->
+        <div class="guest-notice-banner">
+            <div class="notice-content">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <h3>You're browsing as a guest</h3>
+                    <p>You can view chats, clips, and blogs, but you can't comment, message, or interact. <a href="/register">Join Connectra</a> to participate!</p>
+                </div>
+                <a href="/register" class="notice-cta">Sign Up Free</a>
+            </div>
+        </div>
+
+        <!-- Chat Interface (Read-only) -->
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <div class="chat-header">
+                    <h2><i class="fas fa-comments"></i> Public Chats</h2>
+                    <div class="guest-label">View Only</div>
+                </div>
+                
+                <div class="chat-list">
+                    {% for chat in chats %}
+                    <div class="chat-item" onclick="loadGuestChat('{{ chat.id }}')">
+                        <div class="chat-info">
+                            <h3>{{ chat.name }}</h3>
+                            <p>{{ chat.messages|length }} messages</p>
+                        </div>
+                        <div class="chat-type">{{ chat.type }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="chat-main">
+                <div class="chat-header">
+                    <h2 id="current-chat-name">Select a chat to view</h2>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <i class="fas fa-comments"></i>
+                        <h3>Welcome to Connectra Guest Mode!</h3>
+                        <p>Select a chat from the sidebar to view conversations.</p>
+                        <p>To participate in chats, <a href="/register">create an account</a>.</p>
+                    </div>
+                </div>
+
+                <!-- Disabled Chat Input -->
+                <div class="chat-input-container disabled">
+                    <div class="guest-input-notice">
+                        <i class="fas fa-lock"></i>
+                        <span>Sign up to send messages</span>
+                        <a href="/register" class="quick-signup">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .guest-header {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+        }
+
+        .guest-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .guest-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .join-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #6c5ce7;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-left: 1rem;
+        }
+
+        .join-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .exit-guest-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .exit-guest-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .guest-notice-banner {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 1.5rem;
+            margin: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(116, 185, 255, 0.3);
+        }
+
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .notice-content i {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+
+        .notice-text {
+            flex: 1;
+        }
+
+        .notice-text h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .notice-text p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .notice-text a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .notice-cta {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .notice-cta:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .guest-label {
+            background: rgba(108, 92, 231, 0.2);
+            color: #6c5ce7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .chat-input-container.disabled {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem;
+        }
+
+        .guest-input-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: #6c757d;
+        }
+
+        .guest-input-notice i {
+            font-size: 1.2rem;
+            color: #6c5ce7;
+        }
+
+        .quick-signup {
+            background: #6c5ce7;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .quick-signup:hover {
+            background: #5a4fcf;
+            transform: scale(1.05);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+
+        .welcome-message i {
+            font-size: 4rem;
+            color: #6c5ce7;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-message h3 {
+            color: var(--black);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-message a {
+            color: #6c5ce7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .guest-exit {
+            background: rgba(108, 92, 231, 0.1);
+            color: #6c5ce7;
+        }
+
+        .guest-exit:hover {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .notice-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        function loadGuestChat(chatId) {
+            // Load chat messages for viewing only
+            fetch(`/api/chat/${chatId}/messages`)
+                .then(response => response.json())
+                .then(data => {
+                    const messagesContainer = document.getElementById('chat-messages');
+                    const chatName = document.getElementById('current-chat-name');
+                    
+                    chatName.textContent = data.chat_name || 'Chat';
+                    
+                    if (data.messages && data.messages.length > 0) {
+                        messagesContainer.innerHTML = data.messages.map(msg => `
+                            <div class="message guest-message">
+                                <div class="message-header">
+                                    <strong>${msg.username}</strong>
+                                    <span class="timestamp">${new Date(msg.timestamp).toLocaleString()}</span>
+                                </div>
+                                <div class="message-content">${msg.content}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        messagesContainer.innerHTML = `
+                            <div class="welcome-message">
+                                <i class="fas fa-comments"></i>
+                                <h3>No messages yet</h3>
+                                <p>This chat is empty. Be the first to <a href="/register">join and start the conversation</a>!</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading chat:', error);
+                });
+        }
+    </script>
+</body>
+</html>

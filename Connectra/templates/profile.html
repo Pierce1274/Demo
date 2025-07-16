@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectra - Profile</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+    .profile-pic {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 auto 1.2rem auto;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .profile-form {
+        max-width: 340px;
+        margin: 2.5rem auto;
+        background: var(--gray);
+        border-radius: 18px;
+        box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+        padding: 2.5rem 2rem 2rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-form label {
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+        align-self: flex-start;
+    }
+    .profile-form input[type="text"],
+    .profile-form input[type="password"] {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: var(--white);
+        color: var(--black);
+        outline: none;
+        transition: border 0.2s;
+    }
+    .profile-form input[type="file"] {
+        margin-bottom: 1.2rem;
+    }
+    .profile-form button {
+        width: 100%;
+        padding: 0.8rem 0;
+        background: var(--orange);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+        transition: background 0.2s;
+    }
+    .profile-form button:hover {
+        background: var(--red);
+    }
+    .profile-back {
+        display: block;
+        margin: 0 auto 1.5rem auto;
+        color: var(--orange);
+        text-align: center;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    </style>
+</head>
+<body class="auth-bg">
+    <a href="/" class="profile-back">&larr; Back to Home</a>
+    <form class="profile-form" method="POST" enctype="multipart/form-data">
+        {% if user.photo %}
+            <img src="/photos/{{ user.photo }}" class="profile-pic" alt="Profile Photo">
+        {% else %}
+            <div class="profile-pic" id="profile-initials"></div>
+        {% endif %}
+        <label for="display_name">Display Name</label>
+        <input type="text" name="display_name" id="display_name" value="{{ user.display_name }}" required>
+        <label for="photo">Profile Photo</label>
+        <input type="file" name="photo" id="photo" accept="image/*">
+        <label for="password">New Password</label>
+        <input type="password" name="password" id="password" placeholder="Leave blank to keep current">
+        <button type="submit">Update Profile</button>
+    </form>
+    <script>
+    // If no photo, show colored initials
+    {% if not user.photo %}
+    function stringToColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const color = `hsl(${hash % 360}, 70%, 55%)`;
+        return color;
+    }
+    const initials = '{{ user.display_name|default(user.username) }}'.split(' ').map(w => w[0]).join('').toUpperCase();
+    const initialsDiv = document.getElementById('profile-initials');
+    initialsDiv.textContent = initials;
+    initialsDiv.style.background = stringToColor('{{ user.username }}');
+    {% endif %}
+    </script>
+</body>
+</html>
+
