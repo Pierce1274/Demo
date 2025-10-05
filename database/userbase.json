@@ -1,0 +1,249 @@
+{
+  "users": [
+    {
+      "id": "dolanenterprisestech",
+      "username": "dolanenterprisestech",
+      "email": "dolanenterprisestech@gmail.com",
+      "password": "e88fca34f2b4a69d9024b815d10a97e7b5a02e4962fecf174d2c3bbc98329bea",
+      "display_name": "Pierce Dolan",
+      "photo": null,
+      "avatar": null,
+      "online": true,
+      "bio": "",
+      "followers": [],
+      "following": [],
+      "clips_liked": [],
+      "clips_shared": [
+        "ff65e865-ad6a-43d5-820f-c85d24259e97"
+      ]
+    },
+    {
+      "id": "dolanp",
+      "username": "dolanp",
+      "email": "dolanp@gmail.com",
+      "password": "640b94690b02262c7ae4214ac29c685ec7ec390e4fe6334481c2c9837a9fe1a3",
+      "display_name": "Patrick Dolan",
+      "photo": null,
+      "avatar": null,
+      "online": false,
+      "bio": "",
+      "followers": [],
+      "following": [],
+      "clips_liked": [],
+      "clips_shared": []
+    },
+    {
+      "id": "soccerbsboys",
+      "username": "soccerbsboys",
+      "email": "soccerbsboys@gmail.com",
+      "password": "9b0f58b38d9f225d3719416968eea702069a5e98f43de08e20cdb1cf53bd05ac",
+      "display_name": "qPower",
+      "photo": null,
+      "avatar": null,
+      "online": false,
+      "bio": "",
+      "followers": [],
+      "following": [],
+      "clips_liked": [],
+      "clips_shared": []
+    }
+  ],
+  "clips": [
+    {
+      "id": "ff65e865-ad6a-43d5-820f-c85d24259e97",
+      "title": "Home Alone",
+      "description": "Home Akone",
+      "video_filename": "ff65e865-ad6a-43d5-820f-c85d24259e97.mov",
+      "thumbnail": "ff65e865-ad6a-43d5-820f-c85d24259e97_thumb.jpg",
+      "author": "soccerbsboys",
+      "created_at": "2025-07-25T19:55:36.326183",
+      "views": 0,
+      "likes": 2,
+      "comments": [
+        {
+          "id": "915352bd-3ccf-4b4e-8e1a-39641127b2ce",
+          "author": "dolanenterprisestech",
+          "author_display_name": "Pierce Dolan",
+          "author_avatar": null,
+          "content": "whats",
+          "created_at": "2025-07-25T20:46:15.497845",
+          "likes": 0,
+          "liked_by": []
+        },
+        {
+          "id": "f9538b71-0d24-4bea-8b42-c548c32b1c96",
+          "author": "dolanenterprisestech",
+          "author_display_name": "Pierce Dolan",
+          "author_avatar": null,
+          "content": "this",
+          "created_at": "2025-07-25T20:46:23.527353",
+          "likes": 0,
+          "liked_by": []
+        }
+      ],
+      "duration": 0,
+      "liked_by": [
+        "soccerbsboys",
+        "dolanenterprisestech"
+      ],
+      "shares": 1,
+      "shared_by": [
+        "dolanenterprisestech"
+      ]
+    }
+  ],
+  "chats": [
+    {
+      "id": "global",
+      "name": "Global Chat",
+      "type": "public",
+      "participants": [],
+      "messages": [
+        {
+          "id": "msg_1",
+          "user_id": "system",
+          "content": "Welcome to Connectra! ðŸŽ‰ This is a fresh start with no users.",
+          "timestamp": "2025-01-13T10:00:00Z",
+          "type": "text"
+        },
+        {
+          "id": "4177c732-0195-43ee-ac1e-c57c0eff50ec",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "@dolanenterprisestech hi",
+          "timestamp": "2025-07-13T09:45:18.967612",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "f5074b02-6295-47ed-8c68-3a98535e0fcd",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "<span class=\"mention\" data-user=\"dolanp\">@dolanp</span> hi",
+          "raw_content": "@dolanp hi",
+          "mentions": [
+            "dolanp"
+          ],
+          "timestamp": "2025-07-15T14:01:58.602784",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "e7d56c26-e866-47f7-b216-1a9310989328",
+          "user_id": "soccerbsboys",
+          "username": "soccerbsboys",
+          "content": "Ihhihihihihi",
+          "raw_content": "Ihhihihihihi",
+          "mentions": [],
+          "timestamp": "2025-07-25T19:50:00.815850",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "e8a4cb1b-a0e3-42b5-9679-12629a0bb6b3",
+          "user_id": "soccerbsboys",
+          "username": "soccerbsboys",
+          "content": "Hi?",
+          "raw_content": "Hi?",
+          "mentions": [],
+          "timestamp": "2025-07-25T19:50:04.892918",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "de0a7ff7-13aa-4686-b8ea-e31fff34825e",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "hi",
+          "raw_content": "hi",
+          "mentions": [],
+          "timestamp": "2025-07-25T19:50:31.371592",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "57cc73b4-e18b-42e6-9f2f-111051499da2",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "@qPower hello",
+          "raw_content": "@qPower hello",
+          "mentions": [],
+          "timestamp": "2025-07-25T19:50:45.114157",
+          "type": "text",
+          "attachments": []
+        },
+        {
+          "id": "9494c8b6-b0aa-4e63-b970-3f6acd3be206",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "<span class=\"mention\" data-user=\"soccerbsboys\">@soccerbsboys</span> hi",
+          "raw_content": "@soccerbsboys hi",
+          "mentions": [
+            "soccerbsboys"
+          ],
+          "timestamp": "2025-07-27T10:25:39.979043",
+          "type": "text",
+          "attachments": []
+        }
+      ]
+    },
+    {
+      "id": "dm_dolanenterprisestech_dolanenterprisestech",
+      "name": "DM: dolanenterprisestech & dolanenterprisestech",
+      "type": "direct",
+      "participants": [
+        "dolanenterprisestech",
+        "dolanenterprisestech"
+      ],
+      "messages": [],
+      "created_at": "2025-07-13T14:32:04.658455"
+    },
+    {
+      "id": "dm_dolanenterprisestech_dolanp",
+      "name": "DM: dolanenterprisestech & dolanp",
+      "type": "direct",
+      "participants": [
+        "dolanenterprisestech",
+        "dolanp"
+      ],
+      "messages": [
+        {
+          "id": "81efa94b-40e3-4197-bbfa-b95209c47802",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "hi",
+          "raw_content": "hi",
+          "mentions": [],
+          "timestamp": "2025-07-13T15:15:37.725538",
+          "type": "text",
+          "attachments": []
+        }
+      ],
+      "created_at": "2025-07-13T15:15:31.947466"
+    },
+    {
+      "id": "dm_dolanenterprisestech_soccerbsboys",
+      "name": "DM: dolanenterprisestech & soccerbsboys",
+      "type": "direct",
+      "participants": [
+        "dolanenterprisestech",
+        "soccerbsboys"
+      ],
+      "messages": [
+        {
+          "id": "caf87441-fa59-4a01-b42b-9f55c0c0097c",
+          "user_id": "dolanenterprisestech",
+          "username": "dolanenterprisestech",
+          "content": "this is a DM",
+          "raw_content": "this is a DM",
+          "mentions": [],
+          "timestamp": "2025-07-25T19:51:04.166656",
+          "type": "text",
+          "attachments": []
+        }
+      ],
+      "created_at": "2025-07-25T19:50:57.657621"
+    }
+  ],
+  "blogs": []
+}

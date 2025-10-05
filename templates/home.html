@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectra - Home</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="home-bg">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <img src="/favicon.ico" alt="Connectra Logo" class="sidebar-logo" onclick="window.location='/'">
+        <div class="sidebar-link active" title="Home" onclick="window.location='/home'"><i class="fas fa-home"></i></div>
+        <div class="sidebar-link" title="Users" onclick="toggleUserDirectory()"><i class="fas fa-users"></i></div>
+        <div class="sidebar-link" title="Connectra Clips" onclick="window.location='/clips'"><i class="fas fa-play"></i></div>
+        <div class="sidebar-link" title="Blog" onclick="window.location='/blog'"><i class="fas fa-blog"></i></div>
+        <div class="sidebar-link" title="About" onclick="window.location='/about'"><i class="fas fa-info-circle"></i></div>
+        <div class="sidebar-link" title="Profile" onclick="window.location='/profile'"><i class="fas fa-user"></i></div>
+        <div class="sidebar-link" title="Logout" onclick="window.location='/logout'"><i class="fas fa-sign-out-alt"></i></div>
+    </nav>
+    <div class="main-content">
+        <header class="home-header">
+            <img src="/favicon.ico" alt="Connectra Logo" class="home-logo">
+            <span class="home-title">Connectra</span>
+            <a href="/profile" class="home-user-link"><span class="home-user">@{{ user.username }}</span></a>
+            <button class="notification-btn" onclick="toggleNotifications()" title="Notification Settings">
+                <i class="fas fa-bell"></i>
+            </button>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </header>
+        <div class="connectra-flex">
+            <!-- User Directory Panel (Hidden by default) -->
+            <aside id="user-directory" class="user-directory-panel" style="display: none;">
+                <div class="directory-header">
+                    <h2><i class="fas fa-users"></i> User Directory</h2>
+                    <button class="close-directory" onclick="toggleUserDirectory()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="directory-search">
+                    <input type="text" id="user-search" placeholder="Search users..." onkeyup="filterUsers()">
+                </div>
+                <ul id="directory-user-list">
+                    {% for u in users %}
+                    <li class="directory-user-row" onclick="openDirectMessage('{{ u.username }}', '{{ u.display_name }}', '{{ u.avatar or '' }}', {{ u.online|lower }})">
+                        <span class="profile-thumb" style="background: #eee;">
+                            {% if u.avatar %}
+                                <img src="/photos/{{ u.avatar }}" alt="Avatar" class="profile-thumb-img">
+                            {% else %}
+                                {{ u.display_name[0]|upper }}
+                            {% endif %}
+                        </span>
+                        <span class="user-info">
+                            <b>{{ u.display_name }}</b><br>
+                            <span class="user-at">@{{ u.username }}</span>
+                            <span class="user-status {{ 'online' if u.online else 'offline' }}">
+                                {{ 'Online' if u.online else 'Offline' }}
+                            </span>
+                        </span>
+                        <span class="status-dot {{ 'online' if u.online else 'offline' }}"></span>
+                        <div class="chat-action">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+
+            <!-- Active Chats Panel -->
+            <aside class="user-list-panel">
+                <div class="chat-tabs">
+                    <button class="tab-btn active" onclick="switchTab('global')">
+                        <i class="fas fa-globe"></i> Global Chat
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('dms')">
+                        <i class="fas fa-envelope"></i> Direct Messages
+                    </button>
+                </div>
+
+                <!-- Global Chat Users -->
+                <div id="global-users" class="chat-section">
+                    <h3>Online Users</h3>
+                    <ul id="user-list">
+                        {% for u in users %}
+                        {% if u.online %}
+                        <li class="user-row" onclick="openDirectMessage('{{ u.username }}', '{{ u.display_name }}', '{{ u.avatar or '' }}', true)">
+                            <span class="profile-thumb" style="background: #eee;">
+                                {% if u.avatar %}
+                                    <img src="/photos/{{ u.avatar }}" alt="Avatar" class="profile-thumb-img">
+                                {% else %}
+                                    {{ u.display_name[0]|upper }}
+                                {% endif %}
+                            </span>
+                            <span class="user-info">
+                                <b>{{ u.display_name }}</b><br>
+                                <span class="user-at">@{{ u.username }}</span>
+                            </span>
+                            <span class="status-dot online"></span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Direct Messages -->
+                <div id="dm-list" class="chat-section" style="display: none;">
+                    <h3>Recent Chats</h3>
+                    <ul id="recent-chats">
+                        <!-- Will be populated by JavaScript -->
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <section class="chat-area">
+                <div id="chat-app">
+                    <div class="welcome-message">
+                        <i class="fas fa-comments"></i>
+                        <h2>Welcome to Connectra!</h2>
+                        <p>Select a user to start chatting or join the global conversation.</p>
+                        <button onclick="openChat('global')" class="join-global-btn">
+                            <i class="fas fa-globe"></i> Join Global Chat
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/static/notifications.js"></script>
+    <script src="/static/home.js"></script>
+
+    <style>
+        .notification-btn {
+            background: var(--gray);
+            border: 1px solid var(--border);
+            color: var(--black);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .notification-btn:hover {
+            background: var(--orange);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .notification-btn.granted {
+            background: var(--orange);
+            color: white;
+        }
+
+        .notification-btn.denied {
+            background: #f0f0f0;
+            color: #ccc;
+        }
+    </style>
+
+    <script>
+        function toggleNotifications() {
+            if (window.connectraNotifications) {
+                if (connectraNotifications.permission === 'granted') {
+                    alert('🔔 Notifications are enabled!\n\nYou\'ll receive notifications for:\n• Direct messages\n• @ mentions\n• Group messages (when inactive)\n\nTo disable, use your browser settings.');
+                } else if (connectraNotifications.permission === 'denied') {
+                    alert('🔕 Notifications are blocked.\n\nTo enable:\n1. Click the lock icon in your address bar\n2. Allow notifications for this site\n3. Refresh the page');
+                } else {
+                    connectraNotifications.showPermissionDialog();
+                }
+            }
+        }
+
+        // Update notification button state
+        function updateNotificationButton() {
+            const btn = document.querySelector('.notification-btn');
+            if (btn && window.connectraNotifications) {
+                const permission = connectraNotifications.permission;
+                btn.className = `notification-btn ${permission}`;
+
+                if (permission === 'granted') {
+                    btn.innerHTML = '<i class="fas fa-bell"></i>';
+                    btn.title = 'Notifications Enabled - Click for info';
+                } else if (permission === 'denied') {
+                    btn.innerHTML = '<i class="fas fa-bell-slash"></i>';
+                    btn.title = 'Notifications Blocked - Click for help';
+                } else {
+                    btn.innerHTML = '<i class="far fa-bell"></i>';
+                    btn.title = 'Click to Enable Notifications';
+                }
+            }
+        }
+
+        // Update button state when page loads
+        setTimeout(updateNotificationButton, 1000);
+        setInterval(updateNotificationButton, 5000);
+    </script>
+
+</body>
+</html>

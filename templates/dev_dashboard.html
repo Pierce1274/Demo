@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Dashboard - Connectra</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="home-bg">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <img src="/favicon.ico" alt="Connectra Logo" class="sidebar-logo" onclick="window.location='/'">
+        <div class="sidebar-link" title="Home" onclick="window.location='/home'"><i class="fas fa-home"></i></div>
+        <div class="sidebar-link" title="Users" onclick="window.location='/home'"><i class="fas fa-users"></i></div>
+        <div class="sidebar-link" title="Connectra Clips" onclick="window.location='/clips'"><i class="fas fa-play"></i></div>
+        <div class="sidebar-link" title="Blog" onclick="window.location='/blog'"><i class="fas fa-blog"></i></div>
+        <div class="sidebar-link active" title="Dev Dashboard"><i class="fas fa-code"></i></div>
+        <div class="sidebar-link" title="Dev Logout" onclick="window.location='/dev/logout'"><i class="fas fa-sign-out-alt"></i></div>
+    </nav>
+    
+    <div class="main-content">
+        <header class="home-header dev-header">
+            <div class="header-left">
+                <img src="/favicon.ico" alt="Connectra Logo" class="home-logo">
+                <span class="home-title">Developer Dashboard</span>
+                <span class="dev-badge">DEV MODE</span>
+            </div>
+            <a href="/dev/logout" class="logout-btn dev-logout">Exit Dev Mode</a>
+        </header>
+        
+        <div class="dev-content">
+            <!-- User Management -->
+            <section class="dev-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> User Management</h2>
+                    <span class="user-count">{{ users|length }} users</span>
+                </div>
+                
+                <div class="user-grid">
+                    {% for user in users %}
+                    <div class="user-card" data-user-id="{{ user.id }}">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                {% if user.avatar %}
+                                    <img src="/photos/{{ user.avatar }}" alt="Avatar">
+                                {% else %}
+                                    <i class="fas fa-user-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="user-details">
+                                <h3>{{ user.display_name }}</h3>
+                                <p>@{{ user.username }}</p>
+                                <p class="user-email">{{ user.email or 'No email' }}</p>
+                                <div class="user-stats">
+                                    <span class="stat">
+                                        <i class="fas fa-heart"></i> {{ user.clips_liked|length if user.clips_liked else 0 }}
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-users"></i> {{ user.followers|length if user.followers else 0 }}
+                                    </span>
+                                    <span class="status {{ 'online' if user.online else 'offline' }}">
+                                        {{ 'Online' if user.online else 'Offline' }}
+                                    </span>
+                                </div>
+                                {% if user.oauth_provider %}
+                                <div class="oauth-badge">
+                                    <i class="fab fa-{{ user.oauth_provider }}"></i> {{ user.oauth_provider.title() }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="delete-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            
+            <!-- System Stats -->
+            <section class="dev-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> System Statistics</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3>{{ users|length }}</h3>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-play"></i>
+                        <h3>{{ clips|length }}</h3>
+                        <p>Total Clips</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-blog"></i>
+                        <h3>{{ blogs|length }}</h3>
+                        <p>Total Blogs</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-eye"></i>
+                        <h3>{{ users|selectattr("online")|list|length }}</h3>
+                        <p>Online Now</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <style>
+        .dev-header {
+            background: linear-gradient(135deg, var(--red), #cc0000);
+            color: white;
+        }
+        
+        .dev-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+            letter-spacing: 1px;
+        }
+        
+        .dev-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dev-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dev-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dev-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-header h2 {
+            color: var(--red);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-count {
+            background: var(--gray);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .user-card {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .user-card:hover {
+            border-color: var(--red);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-avatar i {
+            font-size: 2rem;
+            color: #ccc;
+        }
+        
+        .user-details h3 {
+            margin: 0 0 0.3rem 0;
+            color: var(--black);
+        }
+        
+        .user-details p {
+            margin: 0.2rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .user-email {
+            font-family: monospace;
+            background: #f8f8f8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem !important;
+        }
+        
+        .user-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        
+        .stat {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .status {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .status.online {
+            color: var(--green);
+        }
+        
+        .status.offline {
+            color: #999;
+        }
+        
+        .oauth-badge {
+            background: var(--orange);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+        
+        .delete-btn {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .delete-btn:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+    </style>
+    
+    <script>
+        async function deleteUser(userId, username) {
+            if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/dev/delete-user/${userId}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Remove user card from UI
+                    const userCard = document.querySelector(`[data-user-id="${userId}"]`);
+                    userCard.style.animation = 'fadeOut 0.5s ease-out forwards';
+                    setTimeout(() => {
+                        userCard.remove();
+                        // Update user count
+                        const userCount = document.querySelector('.user-count');
+                        const currentCount = parseInt(userCount.textContent.split(' ')[0]);
+                        userCount.textContent = `${currentCount - 1} users`;
+                    }, 500);
+                    
+                    alert(result.message);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Failed to delete user: ' + error.message);
+            }
+        }
+    </script>
+    
+    <style>
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.8); }
+        }
+    </style>
+</body>
+</html>
